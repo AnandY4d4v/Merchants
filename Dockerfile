@@ -3,20 +3,27 @@ FROM eclipse-temurin:17-jdk-focal AS builder
 
 WORKDIR /app
 
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle settings.gradle .
+# Copy maven wrapper and config
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+
+# Download dependencies first (better caching)
+RUN chmod +x mvnw
+RUN ./mvnw dependency:go-offline
+
+# Copy source code
 COPY src src
 
-RUN chmod +x gradlew
-RUN ./gradlew bootJar -x test
+# Build jar
+RUN ./mvnw clean package -DskipTests
 
 # ---------- Runtime stage ----------
 FROM eclipse-temurin:17-jre-focal
 
 WORKDIR /app
 
-COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8080
 
