@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8080/merchants";
+const BASE_URL = "https://merchants-ggd5.onrender.com/merchants";
 let selectedMerchantId = null;
 
 document.addEventListener("DOMContentLoaded", loadMerchants);
